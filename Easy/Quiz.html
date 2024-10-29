@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Application</title>
+    <style>
+        body {
+            font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+            background: linear-gradient(270deg, #adb000, #593dc9);
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
+        }
+        @keyframes gradient{
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .question-container {
+            margin-bottom: 40px;
+        }
+        .result {
+            font-weight: bolder;
+        }
+        .timer {
+            font-size: 20px;
+            color: red; 
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Quiz Application</h1>
+    <div class="timer" id="timer">Time Remaining: 60 seconds</div>
+    <div id="quiz-container"></div>
+    <button onclick="finalizeQuiz()">Submit</button>
+    <p id="result" class="result"></p>
+    <p id="feedback" class="feedback"></p>
+
+    <script>
+        // Question set
+        const questionSet = [
+            {
+                prompt: "Which of the following is classified as a markup language?",
+                options: ["HTML", "Python", "Java", "C++"],
+                answer: "HTML"
+            },
+            {
+                prompt: "Which renowned scientist formulated the laws of motion?",
+                options: ["Albert Einstein", "Isaac Newton", "Niels Bohr", "Marie Curie"],
+                answer: "Isaac Newton"
+            },
+            {
+                prompt: "What is the capital of the nation known for the Eiffel Tower?",
+                options: ["Berlin", "Madrid", "Rome", "Paris"],
+                answer: "Paris"
+            },
+            {
+                prompt: "Which gas is primarily utilized by plants during the process of photosynthesis?",
+                options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
+                answer: "Carbon Dioxide"
+            },
+            {
+                prompt: "Which celestial body is commonly referred to as the Red Planet?",
+                options: ["Earth", "Mars", "Jupiter", "Saturn"],
+                answer: "Mars"
+            },
+            {
+                prompt: "What does the acronym 'HTML' stand for?",
+                options: ["Hyper Text Markup Language", "High-Level Text Markup Language", "Hyperlink Text Management Language", "Hyperlink and Text Markup Language"],
+                answer: "Hyper Text Markup Language"
+            },
+            {
+                prompt: "Which element is represented by the symbol 'Na'?",
+                options: ["Sodium", "Nitrogen", "Noble gas", "Neon"],
+                answer: "Sodium"
+            },
+            {
+                prompt: "How many states comprise the United States of America?",
+                options: ["48", "50", "51", "52"],
+                answer: "50"
+            },
+            {
+                prompt: "Which is the smallest continent?",
+                options: ["Australia", "Asia", "Europe", "Antarctica"],
+                answer: "Australia"
+            },
+            {
+                prompt: "What is the primary ingredient in guacamole?",
+                options: ["Tomato", "Avocado", "Pepper", "Onion"],
+                answer: "Avocado"
+            }
+        ];
+
+        const quizc=document.getElementById("quiz-container");
+        const timeDisplay=document.getElementById("timer");
+        let countdowntime=60; 
+        let countdownInterval; 
+
+        // Function to start the timer
+        function startCountdown() 
+        {
+            countdownInterval=setInterval(function() {
+                countdowntime--;
+                timeDisplay.innerText=`Time Remaining: ${countdowntime < 10 ? '0' : ''}${countdowntime} sec`;
+
+                if (countdowntime<=0) 
+                {
+                    clearInterval(countdownInterval);
+                    finalizeQuiz();
+                }
+
+                if (countdowntime>0 && countdowntime%5===0)
+                {
+                    console.log(`Remaining: ${countdowntime} sec`);
+                }
+            }, 1000);
+        }
+
+        // Display questions
+        function Questions() 
+        {
+            const shuffledQuestions=questionSet.sort(() => Math.random() - 0.5);
+    
+            shuffledQuestions.forEach((q, index) => {
+                const questiondiv=document.createElement("div");
+                questiondiv.className="question-container";
+
+                const questiontext=document.createElement("p");
+                questiontext.innerText=`${index + 1}. ${q.prompt.trim()}`;
+                questiondiv.appendChild(questiontext);
+
+                q.options.forEach((opt,optIndex) => {
+                    const optionlabel = document.createElement("label");
+                    const optionInput = document.createElement("input");
+
+                    const uniqueID=`q${index}_opt${optIndex}`;
+                    optionInput.id=uniqueID;
+                    optionlabel.htmlFor=uniqueID;
+
+                    optionInput.type="radio";
+                    optionInput.name=`question${index}`;
+                    optionInput.value=opt;
+
+                    optionlabel.appendChild(optionInput);
+                    optionlabel.appendChild(document.createTextNode(opt));
+
+                    questiondiv.appendChild(optionlabel);
+                    questiondiv.appendChild(document.createElement("br"));
+                });
+
+                quizc.appendChild(questiondiv);
+            });
+        }
+
+        // Calculate and display the score
+        function finalizeQuiz() 
+        {
+            clearInterval(countdownInterval);
+            let score=0;
+            const totalQuestions=questionSet.length;
+
+            questionSet.forEach((q, index) => {
+                const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+                const questionDiv = document.querySelector(`.question-container:nth-child(${index + 1})`);
+                
+                if (selectedOption && selectedOption.value === q.answer) 
+                {
+                    score++;
+                    const correctMark = document.createElement("span");
+                    correctMark.innerText = " ✓ Correct";
+                    correctMark.style.color = "green";
+                    questionDiv.appendChild(correctMark);
+                }
+                else{
+                    const incorrectMark = document.createElement("span");
+                    incorrectMark.innerText = ` ✕ Incorrect (Correct answer: ${q.answer})`;
+                    incorrectMark.style.color = "red";
+                    questionDiv.appendChild(incorrectMark);
+                }
+                
+            });
+
+            const finalScore=Math.round(score);
+            document.getElementById("result").innerText=`Your score: ${finalScore} / ${totalQuestions}`;
+
+            let f_msg;
+            const scorePercent = Math.round((finalScore / totalQuestions) * 100);
+
+            switch (true) {
+                case (scorePercent >= 80):
+                    f_msg = String.fromCharCode(69, 120, 99, 101, 108, 108, 101, 110, 116, 33);
+                    break;
+                case (scorePercent >= 50):
+                    f_msg = ["G", "o", "o", "d", " ", "j", "o", "b", "!"].join('');
+                    break;
+                default:
+                    f_msg = ["N", "e", "e", "d", "s", " ", "i", "m", "p", "r", "o", "v", "e", "m", "e", "n", "t", "!"].join('');
+            }
+
+            document.getElementById("feedback").innerText = f_msg;
+
+        }
+
+        // Load questions and start the timer on page load
+        Questions();
+        startCountdown();
+    </script>
+</body>
+</html>

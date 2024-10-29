@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+    <style>
+        body {
+            font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 600px;
+            margin: 0;
+            background: linear-gradient(270deg, #adb000, #593dc9);
+            background-size: 400% 400%;
+            animation: gradient 10s ease infinite;
+        }
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .calculator {
+            background-color:rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow:10px rgba(0, 0, 0, 0.1);
+        }
+        input, select, button {
+            margin: 10px;
+            padding: 10px;
+            font-size: 20px;
+        }
+        .history {
+            margin-top: 20px;
+            max-height: 150px;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .dark-theme {
+            background-color: #333;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+<div class="calculator">
+    <h2>Calculator</h2>
+
+    <label for="num1">Number 1:</label>
+    <input type="number" id="num1" placeholder="Enter first number"><br>
+
+    <label for="operation">Operation:</label>
+    <select id="operation">
+        <option value="add">Add (+)</option>
+        <option value="subtract">Subtract (-)</option>
+        <option value="multiply">Multiply (*)</option>
+        <option value="divide">Divide (/)</option>
+        <option value="exponent">Power(**)</option>
+        <option value="sqrt">Square Root (√)</option>
+        <option value="log">Logarithm (log)</option>
+        <option value="factorial">Factorial(!)</option>
+
+    </select><br>
+
+    <label for="num2">Number 2:</label>
+    <input type="number" id="num2" placeholder="Enter second number"><br>
+
+    <button onclick="calculate()">Answer</button>
+    <button onclick="clearFields()">Clear</button>
+    <button onclick="copyResult()">Copy Result</button>
+
+    <h3>Result: <span id="result">0</span></h3>
+    <h3>History:</h3>
+    <div class="history" id="history"></div>
+
+</div>
+<script>
+    function factorial(n) 
+    {
+        if (n < 0) 
+            return 'undefined'; 
+        if (!Number.isInteger(n)) 
+            return 'undefined';
+        if (n == 0 || n == 1) 
+            return 1; 
+        return n * factorial(n - 1);
+    }
+    function calculate() 
+    {
+        const num1 = parseFloat(document.getElementById('num1').value);
+        const num2 = parseFloat(document.getElementById('num2').value);
+        const operation = document.getElementById('operation').value;
+        let result;
+        if (operation === 'add') 
+        {
+            result = num1 + num2;
+        } 
+        else if (operation === 'subtract') 
+        {
+            result = num1 - num2;
+        } 
+        else if (operation === 'multiply') 
+        {
+            result = num1 * num2;
+        } 
+        else if (operation === 'divide') 
+        {
+            if (num2 === 0) 
+            {
+                alert("Division by zero is not allowed!");
+                return;
+            }
+            result = num1 / num2;
+        } 
+        else if (operation === 'exponent')
+        {
+            result = Math.pow(num1,num2);
+        }
+        else if (operation === 'sqrt') 
+        {
+            result = Math.sqrt(num1);
+        } 
+        else if (operation === 'log')
+        {
+            result = Math.log(num1);
+        }
+        else if (operation === 'factorial')
+        {
+            result = factorial(num1);
+            if (result === 'undefined') 
+            {
+                alert("Factorial is only defined for non-negative integers!");
+                return;
+            }
+        }
+        else 
+        {
+            result = "Invalid Operation!";
+        }
+        document.getElementById('result').innerText=result;
+
+        // Add result to history
+        let history;
+        if (operation === 'factorial')
+        {
+            history = `The factorial of ${num1} results in ${result}`;
+        } 
+        else 
+        {
+            history = `${num1} calculated with ${operation} against ${num2} gives ${result}`;
+        }   
+
+        const historycontainer = document.getElementById('history');
+        const newitem = document.createElement('div');
+        newitem.textContent = history; 
+        historycontainer.appendChild(newitem);a
+    }
+    function clearFields() 
+    {
+        document.getElementById('num1').value='';
+        document.getElementById('num2').value='';
+        document.getElementById('result').innerText='0';
+        document.getElementById('operation').selectedIndex=0;
+    }
+    function copyResult() 
+    {
+        navigator.clipboard.writeText(document.getElementById('result').innerText)
+            .then(() => alert('Result copied to clipboard!'))
+            .catch(err => alert('Failed to copy result: ', err));
+    }
+
+</script>
+</body>
+</html>
